@@ -1,0 +1,25 @@
+[project]
+name = "fdy"
+description = "日常开发工具库"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "xxwang", email = "78023776@qq.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+]
+
+[project.scripts]
+fdy = "fdy:main"
+
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
