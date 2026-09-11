@@ -78,15 +78,9 @@ Resp.fail(message="参数错误").code == FAIL_CODE  # True
 ```bash
 uv sync                                # 安装依赖（含 dev 组）
 uv run pytest                          # 运行测试
-uv run ruff check src tests scripts    # 静态检查
-uv run ruff format --check src tests   # 格式检查
-```
-
-或使用封装脚本：
-
-```bash
-uv run python -m scripts.lint          # 检查（等价于上面两条）
-uv run python -m scripts.lint fix      # 自动修复 + 格式化
+uv run ruff check src tests            # 静态检查
+uv run ruff format --check src tests   # 格式检查，只校验不改文件
+uv run ruff format src tests           # 自动重排格式
 ```
 
 ## License

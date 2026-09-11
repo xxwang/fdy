@@ -219,3 +219,5 @@ __marimo__/
 
 .idea
 .workbuddy
+.pytest_tmp
+.pytest_tmp/

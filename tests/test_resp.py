@@ -109,7 +109,9 @@ def test_data_not_validated_when_class_is_not_parameterized():
 
 def test_schema_marks_data_as_any_when_unparameterized():
     assert "type" not in Resp.model_json_schema()["properties"]["data"]
-    assert Resp[int].model_json_schema()["properties"]["data"]["anyOf"][0] == {"type": "integer"}
+    assert Resp[int].model_json_schema()["properties"]["data"]["anyOf"][0] == {
+        "type": "integer"
+    }
 
 
 def test_extra_fields_ignored():
