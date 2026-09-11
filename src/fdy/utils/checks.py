@@ -1,7 +1,5 @@
 """类型判断与安全转换。"""
 
-from __future__ import annotations
-
 from collections.abc import Callable, Iterable, Sized
 from typing import Any
 
@@ -39,7 +37,7 @@ def to_int(value: Any, default: int = 0) -> int:
     """转为 int，失败返回 default；小数部分直接截断，整数型字符串含 "1e2" 也可解析。"""
     try:
         return int(float(value))
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return default
 
 
@@ -47,7 +45,7 @@ def to_float(value: Any, default: float = 0.0) -> float:
     """转为 float，失败返回 default。"""
     try:
         return float(value)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return default
 
 
@@ -57,7 +55,7 @@ def safe_cast[T](
     """调用 target(value) 做转换，抛类型或取值异常时返回 default。"""
     try:
         return target(value)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return default
 
 

@@ -3,8 +3,6 @@
 httpx 属于可选依赖：未安装时不影响 `import fdy`，只在真正发起请求时抛出带安装提示的 ImportError。
 """
 
-from __future__ import annotations
-
 from typing import Any
 
 __all__ = [

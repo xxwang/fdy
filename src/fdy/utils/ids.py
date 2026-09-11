@@ -1,7 +1,5 @@
 """标识符与令牌生成。"""
 
-from __future__ import annotations
-
 import secrets
 import uuid
 from typing import Any
@@ -45,6 +43,6 @@ def is_valid_uuid(value: Any, version: int | None = None) -> bool:
     """校验 UUID 字符串，可指定版本号（如 4）。"""
     try:
         parsed = uuid.UUID(str(value))
-    except (ValueError, AttributeError, TypeError):
+    except ValueError, AttributeError, TypeError:
         return False
     return version is None or parsed.version == version

@@ -1,7 +1,5 @@
 """容器与迭代工具。"""
 
-from __future__ import annotations
-
 from collections.abc import (
     Callable,
     Hashable,
@@ -55,7 +53,7 @@ def deep_get(data: Any, path: str, default: Any = None, sep: str = ".") -> Any:
         elif isinstance(current, Sequence) and not isinstance(current, (str, bytes)):
             try:
                 current = current[int(key)]
-            except (ValueError, IndexError):
+            except ValueError, IndexError:
                 return default
         else:
             return default

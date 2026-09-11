@@ -1,7 +1,5 @@
 """常用函数装饰器。"""
 
-from __future__ import annotations
-
 import functools
 import logging
 import time

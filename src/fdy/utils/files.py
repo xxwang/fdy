@@ -1,7 +1,5 @@
 """文件与路径工具。"""
 
-from __future__ import annotations
-
 import hashlib
 import json
 import os
@@ -55,7 +53,7 @@ def read_text(
     """读取文本文件，文件不存在或解码失败时返回 default。"""
     try:
         return Path(path).read_text(encoding=encoding)
-    except (OSError, UnicodeDecodeError):
+    except OSError, UnicodeDecodeError:
         return default
 
 

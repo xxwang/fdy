@@ -6,9 +6,11 @@ license = "MIT"
 authors = [
     { name = "xxwang", email = "78023776@qq.com" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+    "pydantic>=2.13.5",
+]
 
 [project.optional-dependencies]
 http = [
@@ -17,6 +19,7 @@ http = [
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.1",
     "pytest>=8.0",
     "ruff>=0.16.5",
 ]
@@ -32,7 +35,7 @@ source = "vcs"
 packages = ["src/fdy"]
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py314"
 line-length = 88
 
 [tool.ruff.lint]

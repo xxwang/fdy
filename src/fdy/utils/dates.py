@@ -1,7 +1,5 @@
 """日期时间工具，默认以带时区的 UTC 为基准。"""
 
-from __future__ import annotations
-
 from collections.abc import Iterator
 from datetime import UTC, date, datetime, timedelta, timezone
 from typing import Any

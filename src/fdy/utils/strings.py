@@ -1,7 +1,5 @@
 """字符串处理工具。"""
 
-from __future__ import annotations
-
 import re
 import secrets
 import string as _string
