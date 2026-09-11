@@ -81,9 +81,12 @@ def test_is_ok_property():
     assert Resp.fail(message="boom").is_ok is False
 
 
-def test_is_ok_follows_custom_code():
-    assert Resp.ok(code=200).is_ok is False
-    assert Resp.fail(code=0, message="约定俗成的成功码").is_ok is True
+def test_is_ok_accepts_zero_or_http_2xx():
+    assert Resp(code=0).is_ok is True
+    assert Resp(code=200).is_ok is True
+    assert Resp(code=299).is_ok is True
+    assert Resp(code=300).is_ok is False
+    assert Resp(code=1).is_ok is False
 
 
 def test_data_validated_when_class_is_parameterized():
