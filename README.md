@@ -1,6 +1,6 @@
 # fdy
 
-日常开发工具库 —— 9 个模块、78 个公开符号，`import fdy` 开箱即用。
+日常开发工具库 —— 10 个模块、78 个公开符号，`import fdy` 开箱即用。
 
 ## 安装
 
@@ -32,21 +32,20 @@ list(fdy.chunk([1, 2, 3, 4, 5], 2))  # [[1, 2], [3, 4], [5]]
 fdy.group_by(["a", "bb", "cc"], len)  # {1: ['a'], 2: ['bb', 'cc']}
 ```
 
-统一响应模型：
+统一响应模型与业务异常：
 
 ```python
-from fdy import FAIL_CODE, Resp
+from fdy import APIException, APIResponse
 
-Resp.ok(data={"id": 1})  # Resp(code=0, message='success', data={'id': 1})
-Resp.fail(message="参数错误")  # Resp(code=1, message='参数错误', data=None)
+APIResponse.success(data={"id": 1})  # APIResponse(code=0, message='success', data={'id': 1})
+APIResponse.fail(message="参数错误")  # APIResponse(code=1, message='参数错误', data=None)
 
-Resp.fail(message="参数错误").is_ok  # False
-Resp.fail(message="参数错误").code == FAIL_CODE  # True
+raise APIException(code=1001, message="余额不足", status_code=400)
 ```
 
 ## 模块一览
 
-工具函数位于 `fdy.utils` 子包，数据模型位于 `fdy.models`：
+工具函数位于 `fdy.utils` 子包，数据模型位于 `fdy.models`，异常位于 `fdy.exceptions`：
 
 | 模块 | 用途 | 主要函数 |
 | --- | --- | --- |
@@ -58,18 +57,20 @@ Resp.fail(message="参数错误").code == FAIL_CODE  # True
 | `utils.files` | 文件读写与路径处理 | `read_text` `write_text` `read_json` `write_json` `iter_files` `ensure_dir` `human_size` `safe_filename` `unique_path` `file_hash` |
 | `utils.decorators` | 常用函数式装饰器 | `timer` `retry` `memoize` `silent` `singleton` |
 | `utils.http_client` | 基于 httpx 的请求封装（需 `fdy[http]`） | `HttpClient` `get_json` `post_json` |
-| `models.resp` | 统一响应结构 `{code, message, data}` | `Resp`（`Resp.ok` / `Resp.fail`）`OK_CODE` `FAIL_CODE` |
+| `models.api_response` | 统一响应结构 `{code, message, data}` | `APIResponse`（`APIResponse.success` / `APIResponse.fail`） |
+| `exceptions.api_exception` | 业务异常，携带响应码与 HTTP 状态码 | `APIException`（`code` `message` `status_code`） |
 
-所有符号都在顶层重导出，`import fdy` 后直接 `fdy.函数名(...)` 调用；也可以按模块导入，如 `from fdy import strings`、`from fdy import Resp`。
+所有符号都在顶层重导出，`import fdy` 后直接 `fdy.函数名(...)` 调用；也可以按模块导入，如 `from fdy import strings`、`from fdy import APIResponse`。
 
 ## 设计说明
 
 - **仅一个运行时依赖**：`pydantic`（用于 `models`）。`http_client` 所需的 httpx 走可选依赖 `fdy[http]`，其余全部基于标准库。
 - **延迟导入 httpx**：`http_client` 在函数内部导入 httpx，保证未安装 httpx 时 `import fdy` 不失败。
-- **`Resp` 只有一对构造入口**：成功 `Resp.ok(...)`、失败 `Resp.fail(...)`（`message` 必填，避免把失败写成 `code=0` 的成功响应）。不额外提供模块级 `ok` / `fail` 函数，免得把 `ok` / `fail` 这类通用名注入调用方命名空间。
-- **常量只导出协议字段**：`OK_CODE` / `FAIL_CODE` 是机器判断的协议值，可 `from fdy import FAIL_CODE` 直接比较；`Resp.message` 的默认值 `"success"` 是展示文案、随时可能改措辞，因此只作模块内部默认值，不导出。
-- **`Resp.data` 的类型校验需显式参数化**：Python 泛型在运行期拿不到 `T`，`Resp.ok(data=...)` 不会校验 `data`（JSON schema 里 `data` 为 `Any`）；要强校验应写 `Resp[Foo](data=...)` 或 `Resp[Foo].ok(data=...)`，FastAPI 场景由 `response_model=Resp[Foo]` 兜住。
-- **Python 3.14+**：依赖 3.14 的三项语言特性 —— PEP 695（`class Resp[T]`、`def chunk[T](...)` 泛型语法）、PEP 649（注解延迟求值）、PEP 758（`except A, B:` 可省略括号）。
+- **`APIResponse` 只有一对构造入口**：成功 `APIResponse.success(...)`、失败 `APIResponse.fail(...)`，两者均为 keyword-only，`code` / `message` / `data` 都可覆盖。不额外提供模块级 `success` / `fail` 函数，免得把这类通用名注入调用方命名空间。
+- **`code` / `message` 是必填字段**：默认值只由 `success` / `fail` 提供，直接 `APIResponse(...)` 构造时必须显式传入。
+- **默认文案不外泄**：`success` / `fail` 的默认文案写死在签名里，不作模块常量导出 —— 措辞随时可改，导出即成为契约。
+- **`APIResponse.data` 的类型校验需显式参数化**：Python 泛型在运行期拿不到 `T`，`APIResponse.success(data=...)` 不会校验 `data`（JSON schema 里 `data` 为 `Any`）；要强校验应写 `APIResponse[Foo](...)` 或 `APIResponse[Foo].success(data=...)`，FastAPI 场景由 `response_model=APIResponse[Foo]` 兜住。
+- **Python 3.14+**：依赖 3.14 的三项语言特性 —— PEP 695（`class APIResponse[T]`、`def chunk[T](...)` 泛型语法）、PEP 649（注解延迟求值）、PEP 758（`except A, B:` 可省略括号）。
 - **模块命名避开标准库**：用 `containers` / `checks` / `dates`，避免与 `collections` / `types` / `datetime` 混淆。
 - `chunk` 返回生成器，按需迭代；需要列表时用 `list(...)` 包裹。
 

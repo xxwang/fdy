@@ -58,6 +58,7 @@ ignore = [
     "RUF002",  # 中文 docstring 中的全角标点属正常用法
     "RUF003",  # 中文注释中的全角标点属正常用法
     "B008",  # FastAPI 中 Depends(get_session) 的标准写法，非 bug
+    "N818",  # 异常名有意用 APIException（与 APIResponse 成对），不改名
     "W293"
 ]
 

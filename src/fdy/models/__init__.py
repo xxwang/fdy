@@ -1,11 +1,7 @@
-"""fdy.models —— 数据模型。"""
-
-from . import resp
-from .resp import FAIL_CODE, OK_CODE, Resp
+from . import api_response
+from .api_response import APIResponse
 
 __all__ = [
-    "FAIL_CODE",
-    "OK_CODE",
-    "Resp",
-    "resp",
+    "APIResponse",
+    "api_response",
 ]
