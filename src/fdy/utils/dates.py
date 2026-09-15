@@ -43,6 +43,12 @@ def now(tz: timezone | None = None) -> datetime:
     return datetime.now(tz or UTC)
 
 
+def _ensure_utc(dt: datetime) -> datetime:
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+    return dt
+
+
 def parse_datetime(value: Any, default: datetime | None = None) -> datetime | None:
     """解析日期时间，支持 datetime/date 对象与常见字符串格式，失败返回 default。"""
     if isinstance(value, datetime):
@@ -55,12 +61,12 @@ def parse_datetime(value: Any, default: datetime | None = None) -> datetime | No
     if not text:
         return default
     try:
-        return datetime.fromisoformat(text)
+        return _ensure_utc(datetime.fromisoformat(text))
     except ValueError:
         pass
     for fmt in _FALLBACK_FORMATS:
         try:
-            return datetime.strptime(text, fmt)
+            return _ensure_utc(datetime.strptime(text, fmt))
         except ValueError:
             continue
     return default

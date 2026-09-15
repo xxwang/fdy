@@ -21,7 +21,7 @@ __all__ = [
     "write_text",
 ]
 
-_SIZE_UNITS = ("B", "KB", "MB", "GB", "TB", "PB")
+_SIZE_UNITS = ("B", "KB", "MB", "GB", "TB", "PB", "EB")
 _ILLEGAL_FILENAME_CHARS = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
 
 
@@ -111,29 +111,34 @@ def iter_files(
 
 def safe_filename(name: str, replacement: str = "_") -> str:
     """过滤文件名中的非法字符，并去掉首尾空白与点号。"""
-    cleaned = _ILLEGAL_FILENAME_CHARS.sub(replacement, name).strip().strip(".")
+    cleaned = _ILLEGAL_FILENAME_CHARS.sub(replacement, name).strip().rstrip(".")
     return cleaned or "untitled"
 
 
-def unique_path(path: str | os.PathLike) -> Path:
+def unique_path(path: str | os.PathLike, max_attempts: int = 1000) -> Path:
     """路径已存在时追加 (1)、(2) 等序号，返回第一个可用的路径。"""
     target = Path(path)
     if not target.exists():
         return target
-    index = 1
-    while True:
+    for index in range(1, max_attempts + 1):
         candidate = target.parent / f"{target.stem} ({index}){target.suffix}"
         if not candidate.exists():
             return candidate
-        index += 1
+    raise RuntimeError(f"在 {max_attempts} 次尝试后仍未找到可用路径：{target}")
 
 
 def file_hash(
-    path: str | os.PathLike, algorithm: str = "sha256", chunk_size: int = 65536
-) -> str:
-    """计算文件摘要，默认 sha256，分块读取以支持大文件。"""
-    digest = hashlib.new(algorithm)
-    with open(path, "rb") as handle:
-        for block in iter(lambda: handle.read(chunk_size), b""):
-            digest.update(block)
-    return digest.hexdigest()
+    path: str | os.PathLike,
+    algorithm: str = "sha256",
+    chunk_size: int = 65536,
+    default: str | None = None,
+) -> str | None:
+    """计算文件摘要，默认 sha256，分块读取以支持大文件。文件不可读时返回 default。"""
+    try:
+        digest = hashlib.new(algorithm)
+        with open(path, "rb") as handle:
+            for block in iter(lambda: handle.read(chunk_size), b""):
+                digest.update(block)
+        return digest.hexdigest()
+    except OSError:
+        return default

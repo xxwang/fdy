@@ -8,11 +8,11 @@ from fdy import dates
 @pytest.mark.parametrize(
     ("source", "expected"),
     [
-        ("2024-01-02 03:04:05", datetime(2024, 1, 2, 3, 4, 5)),
-        ("2024-01-02T03:04:05", datetime(2024, 1, 2, 3, 4, 5)),
-        ("2024-01-02", datetime(2024, 1, 2)),
-        ("2024/01/02", datetime(2024, 1, 2)),
-        ("20240102", datetime(2024, 1, 2)),
+        ("2024-01-02 03:04:05", datetime(2024, 1, 2, 3, 4, 5, tzinfo=UTC)),
+        ("2024-01-02T03:04:05", datetime(2024, 1, 2, 3, 4, 5, tzinfo=UTC)),
+        ("2024-01-02", datetime(2024, 1, 2, tzinfo=UTC)),
+        ("2024/01/02", datetime(2024, 1, 2, tzinfo=UTC)),
+        ("20240102", datetime(2024, 1, 2, tzinfo=UTC)),
     ],
 )
 def test_parse_datetime_common_formats(source, expected):
@@ -134,9 +134,9 @@ def test_date_range_rejects_non_positive_step():
 
 
 def test_start_and_end_of_day():
-    assert dates.start_of_day("2024-01-02 13:45:00") == datetime(2024, 1, 2)
+    assert dates.start_of_day("2024-01-02 13:45:00") == datetime(2024, 1, 2, tzinfo=UTC)
     assert dates.end_of_day("2024-01-02 13:45:00") == datetime(
-        2024, 1, 2, 23, 59, 59, 999999
+        2024, 1, 2, 23, 59, 59, 999999, tzinfo=UTC
     )
 
 
@@ -147,7 +147,9 @@ def test_start_of_day_preserves_timezone():
 
 
 def test_start_of_month():
-    assert dates.start_of_month("2024-01-15 08:00:00") == datetime(2024, 1, 1)
+    assert dates.start_of_month("2024-01-15 08:00:00") == datetime(
+        2024, 1, 1, tzinfo=UTC
+    )
 
 
 def test_day_boundaries_reject_unparsable_input():

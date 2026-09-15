@@ -26,6 +26,10 @@ def test_human_size_respects_precision():
     assert files.human_size(1234567, precision=3) == "1.177 MB"
 
 
+def test_human_size_supports_exabyte():
+    assert files.human_size(1024**6) == "1 EB"
+
+
 def test_human_size_rejects_negative():
     with pytest.raises(ValueError):
         files.human_size(-1)
@@ -111,6 +115,9 @@ def test_iter_files_yields_nothing_for_missing_root(tmp_path):
         ("  report.txt  ", "report.txt"),
         ("...", "untitled"),
         ("", "untitled"),
+        (".env", ".env"),
+        (".gitignore", ".gitignore"),
+        ("file.", "file"),
     ],
 )
 def test_safe_filename(source, expected):
@@ -143,3 +150,8 @@ def test_file_hash_matches_hashlib(tmp_path):
 def test_file_hash_supports_other_algorithms(tmp_path):
     target = files.write_text(tmp_path / "blob.bin", "hello")
     assert files.file_hash(target, algorithm="md5") == hashlib.md5(b"hello").hexdigest()
+
+
+def test_file_hash_returns_default_for_missing_file():
+    assert files.file_hash("/nonexistent/file", default="") == ""
+    assert files.file_hash("/nonexistent/file") is None

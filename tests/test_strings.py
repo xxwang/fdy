@@ -119,5 +119,10 @@ def test_random_string_rejects_empty_alphabet():
         strings.random_string(4, "")
 
 
+def test_random_string_rejects_zero_length():
+    with pytest.raises(ValueError):
+        strings.random_string(0)
+
+
 def test_normalize_space():
     assert strings.normalize_space("  a \n\t b  ") == "a b"

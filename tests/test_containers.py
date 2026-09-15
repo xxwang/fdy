@@ -51,6 +51,11 @@ def test_deep_set_replaces_non_mapping_intermediate():
     assert data == {"a": {"b": 1}}
 
 
+def test_deep_set_rejects_empty_path():
+    with pytest.raises(ValueError):
+        containers.deep_set({}, "", "x")
+
+
 def test_flatten_nested_mapping():
     assert containers.flatten({"a": {"b": 1}, "c": 2}) == {"a.b": 1, "c": 2}
 

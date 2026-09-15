@@ -41,7 +41,10 @@ def deep_merge(base: Mapping, override: Mapping) -> dict:
 
 
 def deep_get(data: Any, path: str, default: Any = None, sep: str = ".") -> Any:
-    """按 "a.b.0" 这样的路径取值，任一层缺失即返回 default。"""
+    """按 "a.b.0" 这样的路径取值，任一层缺失即返回 default。
+
+    路径以 sep 分隔，键中若含 sep 字符则无法正确取值。
+    """
     if not path:
         return default
     current = data
@@ -63,7 +66,12 @@ def deep_get(data: Any, path: str, default: Any = None, sep: str = ".") -> Any:
 def deep_set(
     data: MutableMapping, path: str, value: Any, sep: str = "."
 ) -> MutableMapping:
-    """按路径写入，中间层缺失或类型不符时自动创建为字典。"""
+    """按路径写入，中间层缺失或类型不符时自动创建为字典。
+
+    路径以 sep 分隔，键中若含 sep 字符则无法正确写入。空路径抛 ValueError。
+    """
+    if not path:
+        raise ValueError("path 不能为空")
     keys = str(path).split(sep)
     current = data
     for key in keys[:-1]:
@@ -155,5 +163,5 @@ def omit(data: Mapping, keys: Iterable) -> dict:
 
 
 def invert(data: Mapping) -> dict:
-    """键值互换，值重复时后者覆盖前者。"""
+    """键值互换，值重复时后者覆盖前者。值必须可哈希，否则抛 TypeError。"""
     return {value: key for key, value in data.items()}

@@ -81,8 +81,8 @@ def mask(value: str, keep_start: int = 0, keep_end: int = 0, char: str = "*") ->
 
 def random_string(length: int = 16, alphabet: str | None = None) -> str:
     """生成随机字符串，默认字母数字组合，使用 secrets 保证密码学安全。"""
-    if length < 0:
-        raise ValueError("length 不能为负数")
+    if length <= 0:
+        raise ValueError("length 必须大于 0")
     chars = _string.ascii_letters + _string.digits if alphabet is None else alphabet
     if not chars:
         raise ValueError("alphabet 不能为空")
